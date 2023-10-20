@@ -1,24 +1,40 @@
-def find_region(map, x, y):
-    char = map[y][x]
-    visited = {}
-    get_region(map, char, visited, x, y)
-    return visited
+def path_intersects(route):
+    route_deduplicated = []
+    for coordinate in route:
+        if coordinate in route_deduplicated:
+            continue
+        route_deduplicated.append(coordinate)
+    if len(route) != len(route_deduplicated):
+        return True
+    if path_intersects_diagonally(route):
+        return True
+    return False
+
+def path_intersects_diagonally(route):
+    diagonal_routes = filter_not_diagonally(route)
+    for diagonal in diagonal_routes:
+        first,second = diagonal
+        x1,y1 = first
+        x2, y2 = second
+        normal2_first = [x2, y1]
+        normal2_second = [x1,y2]
+        if [normal2_first, normal2_second] in diagonal_routes or [normal2_second, normal2_first] in diagonal_routes:
+            return True
+    return False
 
 
-def get_key(x, y):
-    return f'{x},{y}'
 
 
-def get_region(map, char, visited, x, y):
-    if get_key(x, y) in visited:
-        return None
-    if map[y][x] != char or x < 0 or y < 0 or x >= len(map) or y >= len(map):
-        return None
-    visited[get_key(x, y)] = {"coords": [x, y]}
-    get_region(map, char, visited, x - 1, y)
-    get_region(map, char, visited, x + 1, y)
-    get_region(map, char, visited, x, y + 1)
-    get_region(map, char, visited, x, y - 1)
+def filter_not_diagonally(route):
+    new_routes = []
+    for i in range(len(route)-1):
+        x1,y1 = route[i]
+        x2,y2 = route[i+1]
+        if x1 != x2 and y1 != y2:
+            new_routes.append([route[i],route[i+1]])
+    return new_routes
+
+
 
 
 def process_file(input_path, output_path):
@@ -41,10 +57,12 @@ def process_file(input_path, output_path):
             route.append(coordinate)
         routes.append(route)
 
-    results = []
-    print(routes)
     with open(output_path, "w") as outfile:
-        outfile.writelines(results)
+        for route in routes:
+            result = "VALID"
+            if path_intersects(route):
+                result = "INVALID"
+            outfile.write(f"{result}\n")
 
 
 def main():
@@ -55,10 +73,9 @@ def main():
         input_path = f"input_data/level{level}/level{level}_{i}.in"
         output_path = f"output_data/level{level}/level{level}_{i}.out"
         process_file(input_path, output_path)
-
-    # level = 2
-    # input_path = f"input_data/level{level}/level2_example.in"
-    # output_path = f"output_data/level{level}/level2_example.out"
+    #
+    # input_path = f"input_data/level{level}/level{level}_example.in"
+    # output_path = f"output_data/level{level}/level{level}_example.out"
     # process_file(input_path, output_path)
 
 
