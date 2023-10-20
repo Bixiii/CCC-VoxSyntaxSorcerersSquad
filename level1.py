@@ -18,7 +18,7 @@ def process_file(input_path, output_path):
     with open(output_path, "w") as outfile:
         for coord in coords:
             x,y = coord
-            value = map[x][y]
+            value = map[y][x]
             outfile.write(f"{value}\n")
 
 
